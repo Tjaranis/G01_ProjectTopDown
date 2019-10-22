@@ -7,9 +7,9 @@
 #include "GameFramework/Character.h"
 #include "HumanoidBaseCharacter.generated.h"
 
+class UStaticMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
-class UStaticMeshComponent;
 
 
 UCLASS()
@@ -21,19 +21,34 @@ public:
 	// Sets default values for this character's properties
 	AHumanoidBaseCharacter();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera");
-	USpringArmComponent* SpringArm1;
+	//components
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		USpringArmComponent* SpringArmComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		UCameraComponent* CameraComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player")
+		UStaticMeshComponent* MeshComponent;
 
+	//attributes
 	float Speed;
 	float Weight;
 	float Size;
-
-	//mesh representation
-	UStaticMeshComponent Mesh;
+	
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	//movement
+	void MoveForward(float Value);
+	void MoveRight(float Value);
+	void TurnAtRate(float Value);
+	void LookUpAtRate(float Value);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		float BaseTurnRate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		float BaseLookUpAtRate;
+
 
 public:	
 	// Called every frame
