@@ -75,9 +75,6 @@ void AHumanoidBaseCharacter::MoveRight(float Value)
 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, Value, true);
-	
-		
-
 
 		if (Value > 0.0f) {
 			const FRotator LeanRotationR(GetActorRotation().Pitch, GetActorRotation().Yaw, 20.0f);
