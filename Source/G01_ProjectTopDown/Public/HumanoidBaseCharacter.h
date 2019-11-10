@@ -43,6 +43,8 @@ protected:
 	void MoveRight(float Value);
 	void TurnAtRate(float Value);
 	void LookUpAtRate(float Value);
+	void FlyUp(float Value);
+	void FlyDown(float Value);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
 		float BaseTurnRate;

@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Math/UnrealMathVectorCommon.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 
@@ -42,22 +43,30 @@ void AHumanoidBaseCharacter::BeginPlay()
 void AHumanoidBaseCharacter::MoveForward(float Value)
 {
 	if (Controller && Value != 0.0f) {
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value, true);
-
-
-		if (Value > 0.0f) {
-			const FRotator LeanRotation(-20.0f, GetActorRotation().Yaw, GetActorRotation().Roll);
-			const FRotator setLerp = FMath::Lerp(GetActorRotation(), LeanRotation, 0.1f);
-			SetActorRotation(setLerp);
+		if (EMovementMode::MOVE_Flying) {
+			FRotator cameraRotation=CameraComponent->GetComponentRotation();
+			const FRotator RotationDirection(0, 0, cameraRotation.Roll);
+			
+			const FVector Direction = FRotationMatrix(cameraRotation).GetUnitAxis(EAxis::X);
+			AddMovementInput(Direction, Value, true);
 		}
-		else if (Value < 0.0f) {
-			const FRotator LeanRotation(20.0f, GetActorRotation().Yaw, GetActorRotation().Roll);
-			const FRotator setLerp = FMath::Lerp(GetActorRotation(), LeanRotation, 0.1f);
-			SetActorRotation(setLerp);
+		else{
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
+		
+			const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			AddMovementInput(Direction, Value, true);
+
+			if (Value > 0.0f) {
+				const FRotator LeanRotation(-20.0f, GetActorRotation().Yaw, GetActorRotation().Roll);
+				const FRotator setLerp = FMath::Lerp(GetActorRotation(), LeanRotation, 0.1f);
+				SetActorRotation(setLerp);
+			}
+			else if (Value < 0.0f) {
+				const FRotator LeanRotation(20.0f, GetActorRotation().Yaw, GetActorRotation().Roll);
+				const FRotator setLerp = FMath::Lerp(GetActorRotation(), LeanRotation, 0.1f);
+				SetActorRotation(setLerp);
+			}
 		}
 	}
 	else if (Value == 0.0f) {
@@ -103,7 +112,19 @@ void AHumanoidBaseCharacter::LookUpAtRate(float Value)
 {
 	AddControllerPitchInput(-Value * BaseLookUpAtRate * GetWorld()->GetDeltaSeconds());
 }
- 
+
+void AHumanoidBaseCharacter::FlyUp(float Value)
+{
+	/*
+	if (Controller && Value != 0.0f) {
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(Rotation.Pitch, Rotation.Yaw, 90);
+
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Z);
+		AddMovementInput(Direction, Value, true);
+	}*/
+}
+
 // Called every frame
 void AHumanoidBaseCharacter::Tick(float DeltaTime)
 {
@@ -117,6 +138,9 @@ void AHumanoidBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	PlayerInputComponent->BindAction("FlyUp", IE_Pressed, this, &AHumanoidBaseCharacter::Jump);
+	PlayerInputComponent->BindAction("FlyDown", IE_Pressed, this, &AHumanoidBaseCharacter::StopJumping);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AHumanoidBaseCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AHumanoidBaseCharacter::MoveRight);
